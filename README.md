@@ -7,7 +7,7 @@ This document contains a complete description of the Automatic Attendance Projec
 
 ## Use Cases
 
-### Name
+### **Name**
 UC-1: Login
 ### Summary
 The ability to login
@@ -26,8 +26,8 @@ In step 1 the user enters the wrong username. In this case the user is unable to
 In step 2 the user enters the wrong password. In this case the user is unable to login and a message pops up telling the user “Wrong username and password combo”.
 ### Postconditions
 User is now logged in
-.....................
-### Name
+
+### **Name**
 UC-2: Check attendance and schedule (Student)
 ### Summary
 Students can check class attendance and schedule.
@@ -46,8 +46,8 @@ User is shown the days and times the class is held and the number of days they h
 In step 2-4 it could turn out the student has no classes. This is not an issue as it will just not show anything listed.
 ### Postconditions
 User now can view their schedule and attendance
-...............................................
-### Name
+
+### **Name**
 UC-3: Check attendance and schedule (Faculty)
 ### Summary
 Faculty can check class attendance and schedule.
@@ -66,8 +66,8 @@ User is shown the days and times the class is held and the number of days absent
 In step 4 it could turn out no student has been absent. In this case it will just show 0 for number of days absent for each student.
 ### Postconditions
 User now can view their schedule and attendance
-...............................................
-### Name
+
+### **Name**
 UC-3: Check attendance and schedule (Faculty)
 ### Summary
 Faculty can check class attendance and schedule.
@@ -86,8 +86,8 @@ User is shown the days and times the class is held and the number of days absent
 In step 4 it could turn out no student has been absent. In this case it will just show 0 for number of days absent for each student.
 ### Postconditions
 User now can view their schedule and attendance
-...............................................
-### Name
+
+### **Name**
 UC-4: Marking present
 ### Summary
 The professors using the app will be able to take attendance without doing anything themselves
