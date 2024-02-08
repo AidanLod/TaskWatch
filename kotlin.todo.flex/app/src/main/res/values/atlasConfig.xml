@@ -1,0 +1,9 @@
+<resources>
+    <string name="realm_app_id">backend-gcozh</string>
+    <string name="realm_app_url">https://realm.mongodb.com/groups/653beabbb99ba84d3472510e/apps/654403e6bf1b9246dce8f394</string>
+    <string name="realm_base_url">https://realm.mongodb.com</string>
+    <string name="realm_client_api_base_url">https://us-east-1.aws.realm.mongodb.com</string>
+    <string name="realm_data_api_base_url">https://us-east-1.aws.data.mongodb-api.com</string>
+    <string name="realm_data_explorer_link">https://cloud.mongodb.com/links/653beabbb99ba84d3472510e/explorer/SeniorThesis/database/collection/find</string>
+    <string name="realm_data_source_name">mongodb-atlas</string>
+</resources>
