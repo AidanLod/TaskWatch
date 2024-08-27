@@ -60,7 +60,8 @@ void W::WWindow::monitoringLoop() {
             d.time = time;
             d.date = date;
             d.programName = currentWindowName;
-            d.typeName = getWinType(p);
+            p = getWinCategory(p);
+            d.typeName = refineWinCategory(p);
             database.handleTraffic(d);
 
         }
@@ -191,7 +192,6 @@ std::string W::WWindow::findFile(std::string &className) {
             pclose(pipe);
             return std::string(buffer);
         }
-        std::cerr << "No .desktop file found for an application with the name " << className << "\n";
         pclose(pipe);
     }
     //second try with search for Exec with case-insensitive exact match
@@ -208,7 +208,6 @@ std::string W::WWindow::findFile(std::string &className) {
             pclose(pipe);
             return std::string(buffer);
         }
-        std::cerr << "No .desktop file found for an application with the name " << className << "\n";
         pclose(pipe);
     }
     //third try with search for Exec without exact match
@@ -225,7 +224,6 @@ std::string W::WWindow::findFile(std::string &className) {
             pclose(pipe);
             return std::string(buffer);
         }
-        std::cerr << "No .desktop file found for an application with the name " << className << "\n";
         pclose(pipe);
     }
     //fourth try where goes through and checks each part of the string
@@ -248,15 +246,15 @@ std::string W::WWindow::findFile(std::string &className) {
                 std::cerr << "found\n";
                 return std::string(buffer);
             }
-            std::cerr << "No .desktop file found for an application with the name " << iter->str() << "\n";
             pclose(pipe);
         }
         iter++;
     }
+    std::cerr << "No .desktop file found for an application with the name " << className << "\n";
     return "Misc";
 }
 
-std::string W::WWindow::getWinType(std::string &filePath) {
+std::string W::WWindow::getWinCategory(std::string &filePath) {
     std::ifstream desFile(filePath);
     if (!desFile.is_open()) {
         std::cerr << "Cannot open .desktop file: " << filePath<< std::endl;
@@ -267,13 +265,45 @@ std::string W::WWindow::getWinType(std::string &filePath) {
     std::string line;
     while (std::getline(desFile, line)) {
         if (line.find("Categories=") == 0) {
-            line.pop_back();
-            return line.substr(line.find_last_of(';') + 1);
+            std::cerr << line << std::endl;
+            return line.substr(10);
         }
     }
     std::cerr << "No Categories found in .desktop file " << filePath << "\n";
     return "Misc";
 
+}
+
+std::string W::WWindow::refineWinCategory(const std::string& inCat) {
+    if (inCat.find("Settings") != std::string::npos){
+        return "Settings";
+    }
+    if (inCat.find("Development") != std::string::npos){
+        return "Development";
+    }
+    if (inCat.find("Education") != std::string::npos){
+        return "Education";
+    }
+    if (inCat.find("Game") != std::string::npos){
+        return "Games";
+    }
+    if (inCat.find("Graphics") != std::string::npos){
+        return "Graphics";
+    }
+    if (inCat.find("Network") != std::string::npos){
+        return "Internet";
+    }
+    if (inCat.find("Science") != std::string::npos){
+        return "Science";
+    }
+    if (inCat.find("System") != std::string::npos || inCat.find("Emulator") != std::string::npos){
+        return "System";
+    }
+    if (inCat.find("Accessibility") != std::string::npos || inCat.find("Core") != std::string::npos ||
+            inCat.find("Legacy") != std::string::npos || inCat.find("Utility") != std::string::npos){
+        return "Accessories";
+    }
+    return "Other";
 }
 
 void W::WWindow::getDate() {

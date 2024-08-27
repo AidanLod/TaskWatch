@@ -37,8 +37,9 @@ namespace W
         void monitoringLoop();
         void getWindowName(const std::string&); //gets current window name
         void getClassName(); //gets the current windows class name
-        std::string findFile(std::string&); //takes the executable path and returns the .desktop path
-        std::string getWinType(std::string&); //takes the .desktop path and returns the name of the category that the program falls under
+        static std::string findFile(std::string&); //takes the executable path and returns the .desktop path
+        static std::string getWinCategory(std::string &filePath); //takes the .desktop path and returns the name of the category that the program falls under
+        static std::string refineWinCategory(const std::string& inCat); //refines the category based on the parameters used to sort applications as defined in the xfce-applications.menu
         void getDate(); //gets the current date and returns it as a string mm/dd/yy
         //objects
         FILE* eFile; //holds pointer to newly opened stream
