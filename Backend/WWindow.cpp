@@ -5,11 +5,11 @@
 #include "WWindow.h"
 
 W::WWindow::WWindow(Q::QueryClass& db, unsigned char& ec): exitCode(ec), database(db) {
-    eFile = freopen("ErrorOutput.txt", "w", stderr);
+/*    eFile = freopen("ErrorOutput.txt", "w", stderr);
     if (eFile == nullptr) {
         std::cerr << "Error redirecting stderr to file." << std::endl;
         exitCode = 1;
-    }
+    }*/
     monitoring.store(false);
     display = XOpenDisplay(nullptr);
     if (!display) {
@@ -60,6 +60,7 @@ void W::WWindow::monitoringLoop() {
             d.time = time;
             d.date = date;
             d.programName = currentWindowName;
+            d.className = currentClassName;
             p = getWinCategory(p);
             d.typeName = refineWinCategory(p);
             database.handleTraffic(d);
@@ -177,7 +178,7 @@ std::string W::WWindow::getPath(pid_t &pid) {
 
 }*/
 
-std::string W::WWindow::findFile(std::string &className) {
+std::string W::WWindow::findFile(std::string &className) { //fix this to make it more stable
     std::vector<std::string> searchPaths = {"/usr/share/applications/", "/var/lib/flatpak/exports/share/applications/"};
 
     for (const std::string& dir : searchPaths) {

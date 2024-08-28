@@ -4,12 +4,13 @@
 #include "QueryClass.h"
 namespace Q {
     QueryClass::QueryClass(unsigned char &ec) : exitCode(ec) {
-        file = freopen("ErrorOutput.txt", "w", stderr);
+        /*file = freopen("ErrorOutput.txt", "w", stderr);
         if (file == nullptr) {
             std::cerr << "Error redirecting stderr to file." << std::endl;
             exitCode = 1;
-        }
-        rc = sqlite3_open("timeData.db", &db);
+        }*/
+        //file = freopen("log.txt", "w", stdout);
+        int rc = sqlite3_open("timeData.db", &db);
         try { //block 1
             if (rc != SQLITE_OK) {
                 throw (rc);
@@ -32,6 +33,7 @@ namespace Q {
     void QueryClass::handleError(int ecode, int bNum, const std::string &fName) {
         std::cerr << "Additional information for provided SQLite error codes may be found at\n"
                      "https://sqlite.org/rescode.html#ok\n";
+        std::cerr << sqlite3_errmsg(db) << std::endl;
         switch (ecode) {
             case 1:
                 std::cerr << "ERR Code (Q1): SQLITE_ERROR\n"
@@ -97,7 +99,7 @@ namespace Q {
             Table t = d.table;
             if (t != END) { //end is only added to the queue when the program is shutting down
                 if (d.request) {
-                    //gets the data depending on what is requested
+                    storeDataDate(d.date);
                 }
                 else if (t == ACTIVITY)
                     handleActivity(d.activityName);
@@ -171,7 +173,7 @@ namespace Q {
         const char *sql;
         sqlite3_stmt *stmt;
         sql = "UPDATE activity SET active = ? WHERE id = ?;";
-        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         try { //block 1
             if (rc != SQLITE_OK)
                 throw (rc);
@@ -218,7 +220,7 @@ namespace Q {
     bool QueryClass::insertActivity(const std::string &name) {
         sqlite3_stmt *stmt;
         const char *sql = "INSERT OR IGNORE INTO activity (name, active) VALUES (?, 1);";
-        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         try { //block 4
             if (rc != SQLITE_OK)
                 throw (rc);
@@ -252,7 +254,7 @@ namespace Q {
     bool QueryClass::getActivityID(const std::string &name) {
         sqlite3_stmt *stmt;
         const char *sql = "SELECT id FROM activity WHERE name = ?;";
-        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         try { //block 7
             if (rc != SQLITE_OK)
                 throw (rc);
@@ -295,8 +297,8 @@ namespace Q {
 
     void QueryClass::insertProgram(const data& d) {
         sqlite3_stmt *stmt;
-        const char *sql = "INSERT OR IGNORE INTO program (name, type) VALUES (?, ?);";
-        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        const char *sql = "INSERT OR IGNORE INTO program (name, class) VALUES (?, ?);";
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         try { //block 1
             if (rc != SQLITE_OK) {
                 throw (rc);
@@ -315,9 +317,9 @@ namespace Q {
         }
         insertType(d.typeName);
         int typeID = getTypeID(d.typeName);
-        if (typeID == 0)
-            typeID = 1;
-        rc = sqlite3_bind_int(stmt, 2, typeID);
+        insertClass(d.className, typeID);
+        int classID = getClassID(d.className);
+        rc = sqlite3_bind_int(stmt, 2, classID);
         try { //block 3
             if (rc != SQLITE_OK)
                 throw (rc);
@@ -325,6 +327,7 @@ namespace Q {
             handleError(ecode, 3, "insertProgram()");
             return;
         }
+
         rc = sqlite3_step(stmt);
         try { //block 4
             if (rc != SQLITE_DONE)
@@ -342,7 +345,7 @@ namespace Q {
     int QueryClass::getProgramID(const std::string & name) {
         sqlite3_stmt *stmt;
         const char *sql = "SELECT id FROM program WHERE name = ?;";
-        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         try { //block 1
             if (rc != SQLITE_OK)
                 throw (rc);
@@ -380,7 +383,7 @@ namespace Q {
     void QueryClass::insertType(const std::string & type) {
         sqlite3_stmt  *stmt;
         const char *sql = "INSERT OR IGNORE INTO type (name) VALUES (?);";
-        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         try { //block 1
             if (rc != SQLITE_OK) {
                 throw (rc);
@@ -413,7 +416,7 @@ namespace Q {
     int QueryClass::getTypeID(const std::string & name) {
         sqlite3_stmt *stmt;
         const char *sql = "SELECT id FROM type WHERE name = ?;";
-        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         try { //block 1
             if (rc != SQLITE_OK)
                 throw (rc);
@@ -447,8 +450,86 @@ namespace Q {
         return typeID;
     }
 
+    void QueryClass::insertClass(const std::string & cName, int tid) {
+        sqlite3_stmt  *stmt;
+        const char *sql = "INSERT OR IGNORE INTO class (name, type) VALUES (?, ?);";
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        try { //block 1
+            if (rc != SQLITE_OK) {
+                throw (rc);
+            }
+        } catch (int ecode) {
+            handleError(ecode, 1, "insertClass()");
+            return;
+        }
+        rc = sqlite3_bind_text(stmt, 1, cName.c_str(), -1, SQLITE_STATIC);
+        try { //block 2
+            if (rc != SQLITE_OK)
+                throw (rc);
+        } catch (int ecode) {
+            handleError(ecode, 2, "insertClass()");
+            return;
+        }
+        rc = sqlite3_bind_int(stmt, 2, tid);
+        try { //block 3
+            if (rc != SQLITE_OK)
+                throw (rc);
+        } catch (int ecode) {
+            handleError(ecode, 3, "insertClass()");
+            return;
+        }
+        rc = sqlite3_step(stmt);
+        try { //block 4
+            if (rc != SQLITE_DONE)
+                throw (rc);
+
+        } catch (int ecode) {
+            handleError(ecode, 4, "insertClass()");
+            if (ecode != SQLITE_CONSTRAINT)
+                return;
+        }
+        sqlite3_finalize(stmt);
+    }
+
+    int QueryClass::getClassID(const std::string & name) {
+        sqlite3_stmt *stmt;
+        const char *sql = "SELECT id FROM class WHERE name = ?;";
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        try { //block 1
+            if (rc != SQLITE_OK)
+                throw (rc);
+        } catch (int ecode) {
+            handleError(ecode, 1, "getClassID()");
+            return 0;
+        }
+        rc = sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
+        try { //block 2
+            if (rc != SQLITE_OK)
+                throw (rc);
+        } catch (int ecode) {
+            handleError(ecode, 2, "getClassID()");
+            return 0;
+        }
+        int classID;
+        rc = sqlite3_step(stmt);
+        try { //block 3
+            if (rc != SQLITE_DONE && rc != SQLITE_ROW)
+                throw (rc);
+            if (rc != SQLITE_ROW) {
+                std::cerr << "No class found with name " << name << std::endl;
+                return 0;
+            }
+            classID = sqlite3_column_int(stmt, 0);
+        } catch (int ecode) {
+            handleError(ecode, 3, "getClassID()");
+            return 0;
+        }
+        sqlite3_finalize(stmt);
+        return classID;
+    }
+
     void QueryClass::handlePTime(data& d) {
-        pTime ptimeData;
+        inPTime ptimeData;
         ptimeData.date = d.date; //sets date
         ptimeData.utsStart = d.time; //sets time
         insertProgram(d); //inserts the program if it doesn't exist
@@ -460,7 +541,7 @@ namespace Q {
         if (getCurrentPTime(ptimeData)){ //if ptime exists edit utsStart
             sqlite3_stmt *stmt;
             const char *sql = "UPDATE pTime SET utsStart = ? WHERE id = ?;";
-            rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+            int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
             try { //block 1
                 if (rc != SQLITE_OK)
                     throw (rc);
@@ -498,10 +579,10 @@ namespace Q {
 
     }
 
-    void QueryClass::insertPtime(pTime & pt) {
+    void QueryClass::insertPtime(inPTime & pt) {
         sqlite3_stmt *stmt;
-        const char *sql = "INSERT OR IGNORE INTO pTime (pid, utsStart, timeUsed, activity, date) VALUES (?, ?, 0, ?, ?);";
-        rc = sqlite3_prepare_v2(db, sql,  -1, &stmt, nullptr);
+        const char *sql = "INSERT OR IGNORE INTO pTime (program, utsStart, timeUsed, activity, date) VALUES (?, ?, 0, ?, ?);";
+        int rc = sqlite3_prepare_v2(db, sql,  -1, &stmt, nullptr);
         try { //block 1
             if (rc != SQLITE_OK) {
                 throw (rc);
@@ -557,10 +638,10 @@ namespace Q {
 
     }
 
-    bool QueryClass::getCurrentPTime(pTime & pt) {
+    bool QueryClass::getCurrentPTime(inPTime & pt) {
         sqlite3_stmt *stmt;
-        const char *sql = "SELECT id FROM pTime WHERE pid = ? AND date = ? AND activity = ?;";
-        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        const char *sql = "SELECT id FROM pTime WHERE program = ? AND date = ? AND activity = ?;";
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         try { //block 1
             if (rc != SQLITE_OK)
                 throw (rc);
@@ -613,7 +694,7 @@ namespace Q {
         int tu = getTimeUsed(id) + (uts - utss);
         sqlite3_stmt *stmt;
         const char *sql = "UPDATE pTime SET timeUsed = ? WHERE id = ?;";
-        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         try { //block 1
             if (rc != SQLITE_OK)
                 throw (rc);
@@ -661,7 +742,7 @@ namespace Q {
     int QueryClass::getTimeUsed(int id) {
         sqlite3_stmt *stmt;
         const char *sql = "SELECT utsStart, timeUsed FROM pTime WHERE id = ?;";
-        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         try { //block 1
             if (rc != SQLITE_OK)
                 throw (rc);
@@ -697,38 +778,69 @@ namespace Q {
         return timeUsed;
     }
 
-    std::queue<pTime> QueryClass::returnData() {
-        std::queue<pTime> rData;
+    void QueryClass::storeDataDate(std::string date) {
+        std::lock_guard<std::mutex> lock (rMutex);
         sqlite3_stmt *stmt;
-        const char *sql = "SELECT * FROM pTime;";
-        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        const char *sql = R"(
+        SELECT pTime.timeUsed, program.name, activity.name, type.name, pTime.date, class.name
+        FROM ptime
+        JOIN program ON pTime.program = program.id
+        JOIN activity ON pTime.activity = activity.id
+        JOIN class ON program.class = class.id
+        JOIN type ON class.type = type.id
+        WHERE pTime.date >= ?;)";
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
         try{//block 1
             if (rc != SQLITE_OK)
                 throw (rc);
         } catch (int ecode) {
-            handleError(ecode, 1, "returnData()");
-            return rData;
+            handleError(ecode, 1, "storeDataDate()");
+            cvr.notify_one();
+            return;
         }
-        rc = sqlite3_step(stmt);
-        try { //block 2
-            if (rc!= SQLITE_DONE && rc != SQLITE_ROW)
+        rc = sqlite3_bind_text(stmt, 1, date.c_str(), -1, SQLITE_STATIC);
+        try{ //block 2
+            if (rc != SQLITE_OK)
                 throw (rc);
-            if (rc != SQLITE_ROW){
-                std::cerr << "No pTime data found \n";
-                return rData;
-            }
+
         } catch (int ecode){
-            handleError(ecode, 2, "returnData()");
-            return rData;
+            handleError(ecode, 2, "storeDataDate()");
+            cvr.notify_one();
+            return;
         }
-        //insert the retrieval of the row data to create a ptime struct object to push onto rData
-        //insert while loop where while rc == SQLITE_ROW the loop continues or something, gotta look into how retrieving multiple rows works
-//        rData.push()
-        return rData;
+        try { //block 3
+            while ((rc = sqlite3_step(stmt)) == SQLITE_ROW){ //loop that steps through and gets all the necessary data to graph the time spent
+                outPTime ptime;
+                ptime.timeUsed = sqlite3_column_int(stmt, 0);
+                ptime.pName = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
+                ptime.aName = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)));
+                ptime.tName = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3)));
+                ptime.date = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4)));
+                ptime.cName = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5)));
+                rData.push(ptime);
+            }
+            if (rc!= SQLITE_DONE)
+                throw (rc);
+            std::cerr << "No more pTime data found \n";
+            cvr.notify_one();
+            return;
+
+        } catch (int ecode){
+            handleError(ecode, 3, "storeDataDate()");
+            cvr.notify_one();
+            return;
+        }
     }
 
-    std::queue<pTime> QueryClass::returnDataRestricted() {
-        return std::queue<pTime>();
+    std::queue<outPTime> QueryClass::getData() {
+        std::unique_lock<std::mutex> lock(rMutex);
+        cvr.wait(lock,[this] {return !rData.empty();});
+        std::cerr << "getData\n";
+        std::queue<outPTime> temp = rData;
+        while (!rData.empty()) {
+            rData.pop();
+        }
+        return temp;
     }
 
 

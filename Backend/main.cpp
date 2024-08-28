@@ -3,6 +3,7 @@
 #include "WWindow.h"
 
 int main() {
+    freopen("ErrorOutput.txt", "w", stderr);
     unsigned char exitCode = 0; //everywhere where exit code is present that will turn into an error popup in the frontend this is just a placeholder
     Q::QueryClass qC(exitCode);
     W::WWindow changeCheck(qC, exitCode);
@@ -33,6 +34,16 @@ int main() {
             counter++;
         }
 
+    }
+    std::cout << std::endl;
+    d.date = "2024-08-26";
+    d.request = true;
+    qC.handleTraffic(d);
+    std::queue<Q::outPTime> pTime;
+    pTime = qC.getData();
+    while (!pTime.empty()){
+        std::cout << pTime.front().pName << " " << pTime.front().timeUsed << " " << pTime.front().tName << " " << pTime.front().date << " " << pTime.front().aName << pTime.front().cName << std::endl;
+        pTime.pop();
     }
 
     changeCheck.stopMonitoring();

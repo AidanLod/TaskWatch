@@ -2,57 +2,38 @@ Terminal -
 Xfce4-terminal
 second search
 Categories=GTK;System;TerminalEmulator;
-refineWinCategory
-Terminal - 
-Terminal Preferences
-Xfce4-terminal
-second search
-Categories=GTK;System;TerminalEmulator;
-refineWinCategory
-Steam
-steam
-Categories=Network;FileTransfer;Game;
-refineWinCategory
-    DOOM - max 100% cycles/ms - DOSBox Staging - mouse captured, Ctrl+F10 or middle-click to release
-steam_app_2280
+Backend – WWindow.cpp
+jetbrains-clion
 second search
 third search
 fourth search
-steam
+jetbrains
 found
-Categories=Network;FileTransfer;Game;
-refineWinCategory
-Steam
-steam
-Categories=Network;FileTransfer;Game;
-refineWinCategory
-Hylics
-steam_app_397740
-second search
-third search
-fourth search
-steam
-found
-Categories=Network;FileTransfer;Game;
-refineWinCategory
-Steam
-steam
-Categories=Network;FileTransfer;Game;
-refineWinCategory
-ChatGPT — Mozilla Firefox
-Firefox
-Categories=GNOME;GTK;Network;WebBrowser;
-refineWinCategory
-discordapp.com/app?_=1724271303889 - Discord
-discord
-Categories=Network;InstantMessaging;
-refineWinCategory
-DB Browser for SQLite - /home/aidan/Projects/Thesis/TaskWatch/Backend/timeData.db
+Categories=Development;IDE;
+DB Browser for SQLite - /home/aidan/Projects/Thesis/TaskWatch/Backend/timeData.sqbpro [timeData.db]
 DB Browser for SQLite
 Categories=Development;Utility;Database;
-refineWinCategory
+SQLITE_ROW Handling Issues — Mozilla Firefox
+Firefox
+Categories=GNOME;GTK;Network;WebBrowser;
+SQLITE_ROW Handling Issues — Mozilla Firefox
+daylist | Spotify Playlist — Mozilla Firefox
+Have you completed your full application for Miami Waterkeeper - Full Stack Developer at Miami Tech Works? - aidanlods@gmail.com - Gmail — Mozilla Firefox
+SQL ALTER TABLE Statement — Mozilla Firefox
+Externally Modified
+Mousepad
+Categories=Utility;TextEditor;GTK;
+Qt Creator
+QtCreator
+second search
+third search
+Categories=Development;IDE;Qt;
+Backend - Thunar
+Thunar
+Categories=System;Core;GTK;FileTools;FileManager;
 Terminal - 
 Xfce4-terminal
 second search
 Categories=GTK;System;TerminalEmulator;
-refineWinCategory
+No more pTime data found 
+getData
