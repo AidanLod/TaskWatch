@@ -1,9 +1,9 @@
 #include <iostream>
-#include "QueryClass.h"
-#include "WWindow.h"
+#include "../include/QueryClass.h"
+#include "../include/WWindow.h"
 
 int main() {
-    freopen("ErrorOutput.txt", "w", stderr);
+//    freopen("ErrorOutput.txt", "w", stderr);
     unsigned char exitCode = 0; //everywhere where exit code is present that will turn into an error popup in the frontend this is just a placeholder
     Q::QueryClass qC(exitCode);
     W::WWindow changeCheck(qC, exitCode);

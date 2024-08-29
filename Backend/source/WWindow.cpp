@@ -2,7 +2,7 @@
 //
 // Created by main on 6/2/24.
 //
-#include "WWindow.h"
+#include "../include/WWindow.h"
 
 W::WWindow::WWindow(Q::QueryClass& db, unsigned char& ec): exitCode(ec), database(db) {
 /*    eFile = freopen("ErrorOutput.txt", "w", stderr);
