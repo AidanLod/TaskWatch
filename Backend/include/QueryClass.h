@@ -64,10 +64,9 @@ namespace Q
         void requestLoop(); //always running only stops at due to mutex locks or the end of the program
             //error handling
         void handleError(int ecode, std::string, const std::string&); //handles all sqlite return error codes
-            //misc necessary
+            //callBacks for sqlite3_exec()
         static int idCallback(void* data, int argc, char** argv, char** azColName); //used for the ID callback for all the get_ID() functions
         int timeCallback(void* data, int argc, char** argv, char** azColName); //used for getTimeUsed()
-        static int dataCallback(void* data, int argc, char** argv, char** azColName); //used for storeDataDate()
             //handling different tables
         void handleActivity(const std::string&); //handles the process for inserting and changing activities
         void handlePTime(data&); //gets all the data together to insert and edit a pTime row

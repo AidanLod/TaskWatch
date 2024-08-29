@@ -20,6 +20,7 @@
 #include <sstream>
 #include <iomanip>
 #include <climits>
+#include <cctype>
 
 namespace W
 {
