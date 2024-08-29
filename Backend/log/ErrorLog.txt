@@ -2,38 +2,14 @@ Terminal -
 Xfce4-terminal
 second search
 Categories=GTK;System;TerminalEmulator;
-Backend – WWindow.cpp
-jetbrains-clion
-second search
-third search
-fourth search
-jetbrains
-found
-Categories=Development;IDE;
-DB Browser for SQLite - /home/aidan/Projects/Thesis/TaskWatch/Backend/timeData.sqbpro [timeData.db]
-DB Browser for SQLite
-Categories=Development;Utility;Database;
-SQLITE_ROW Handling Issues — Mozilla Firefox
-Firefox
-Categories=GNOME;GTK;Network;WebBrowser;
-SQLITE_ROW Handling Issues — Mozilla Firefox
-daylist | Spotify Playlist — Mozilla Firefox
-Have you completed your full application for Miami Waterkeeper - Full Stack Developer at Miami Tech Works? - aidanlods@gmail.com - Gmail — Mozilla Firefox
-SQL ALTER TABLE Statement — Mozilla Firefox
-Externally Modified
-Mousepad
-Categories=Utility;TextEditor;GTK;
-Qt Creator
-QtCreator
-second search
-third search
-Categories=Development;IDE;Qt;
-Backend - Thunar
-Thunar
-Categories=System;Core;GTK;FileTools;FileManager;
+No type found with name System
+No class found with name Xfce4-terminal
+Current pTime not found with given parameters: pid: 1 date: 2024-08-28 activity: 1
 Terminal - 
-Xfce4-terminal
-second search
-Categories=GTK;System;TerminalEmulator;
+No type found with name System
+No class found with name Xfce4-terminal
+Terminal - 
+No type found with name System
+No class found with name Xfce4-terminal
+Current pTime not found with given parameters: pid: 1 date: 2024-08-28 activity: 2
 No more pTime data found 
-getData
