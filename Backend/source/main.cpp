@@ -41,11 +41,12 @@ int main() {
     qC.handleTraffic(d);
     std::queue<Q::outPTime> pTime;
     pTime = qC.getData();
+    std::cout << "Enetered Loop\n";
     while (!pTime.empty()){
         std::cout << pTime.front().pName << " " << pTime.front().timeUsed << " " << pTime.front().tName << " " << pTime.front().date << " " << pTime.front().aName << pTime.front().cName << std::endl;
         pTime.pop();
     }
-
+    std::cout << "Exit Loop\n";
     changeCheck.stopMonitoring();
     qC.endLoop();
     return exitCode;

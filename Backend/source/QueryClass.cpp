@@ -211,7 +211,6 @@ namespace Q {
     std::queue<outPTime> QueryClass::getData() {
         std::unique_lock<std::mutex> lock(rMutex);
         cvr.wait(lock,[this] {return !rData.empty();});
-        std::cerr << "getData\n";
         std::queue<outPTime> temp = rData;
         while (!rData.empty()) {
             rData.pop();
@@ -253,26 +252,6 @@ namespace Q {
             *timeData = std::stoi(argv[1]);  // Set timeUsed from the second column
         }
         return 0; // Success
-    }
-
-    int QueryClass::dataCallback(void *data, int argc, char **argv, char **azColName) {
-        auto* rDataPtr = static_cast<std::queue<outPTime>*>(data);
-
-        outPTime ptime;
-        if (argc >= 6) {
-            for (int i = 0; i + 5 < argc; i += 6) {
-                ptime.timeUsed = std::stoi(argv[i]);
-                ptime.pName = argv[i + 1] ? argv[i + 1] : "";
-                ptime.aName = argv[i + 2] ? argv[i + 2] : "";
-                ptime.tName = argv[i + 3] ? argv[i + 3] : "";
-                ptime.date = argv[i + 4] ? argv[i + 4] : "";
-                ptime.cName = argv[i + 5] ? argv[i + 5] : "";
-
-                rDataPtr->push(ptime);
-            }
-            return 0; // Success
-        }
-        return 1;
     }
 
     //handling different tables
@@ -515,7 +494,6 @@ namespace Q {
         if (rc != SQLITE_OK) {
             throw rc; //throw the sqlite error code
         }
-
         return retID;
     }
 
@@ -554,7 +532,6 @@ namespace Q {
         try {
             //execute sql statement
             programID = getID(sql, errMsg);
-
             //check if a result was found
             if (programID == 0) {
                 std::cerr << "No program found with name " << name << std::endl;
@@ -576,12 +553,11 @@ namespace Q {
         int typeID = 0; //default value for no result
 
         //construct the sql statement
-        std::string sql = "SELECT id FROM program WHERE name = '" + name + "';";
+        std::string sql = "SELECT id FROM type WHERE name = '" + name + "';";
 
         try {
             //execute sql statement
             typeID = getID(sql, errMsg);
-
             //check if a result was found
             if (typeID == 0) {
                 std::cerr << "No type found with name " << name << std::endl;
@@ -603,12 +579,11 @@ namespace Q {
         int classID = 0; //default value for no result
 
         //construct the sql statement
-        std::string sql = "SELECT id FROM program WHERE name = '" + name + "';";
+        std::string sql = "SELECT id FROM class WHERE name = '" + name + "';";
 
         try {
             //execute sql statement
             classID = getID(sql, errMsg);
-
             //check if a result was found
             if (classID == 0) {
                 std::cerr << "No class found with name " << name << std::endl;
@@ -637,7 +612,6 @@ namespace Q {
         try {
             //execute sql statement
             pTimeID = getID(sql, errMsg);
-
             //check if a result was found
             if (pTimeID == 0) {
                 std::cerr << "Current pTime not found with given parameters: pid: " << pt.pid << " date: " << pt.date << " activity: " << pt.aid << std::endl;
@@ -682,35 +656,57 @@ namespace Q {
     }
 
     void QueryClass::storeDataDate(std::string date) {
-        std::lock_guard<std::mutex> lock(rMutex);
-
-        char* errMsg = nullptr;
-        //construct the sql statement
-        std::string sql = R"(
+        std::lock_guard<std::mutex> lock (rMutex);
+        sqlite3_stmt *stmt;
+        const char *sql = R"(
         SELECT pTime.timeUsed, program.name, activity.name, type.name, pTime.date, class.name
         FROM ptime
         JOIN program ON pTime.program = program.id
         JOIN activity ON pTime.activity = activity.id
         JOIN class ON program.class = class.id
         JOIN type ON class.type = type.id
-        WHERE pTime.date >= ')" + date + "';";
-
-
-        try {
-            //execute sql statement
-            int rc = sqlite3_exec(db, sql.c_str(), dataCallback, &rData, &errMsg);
-            if (rc != SQLITE_OK) {
-                throw rc; //throw the SQLite error code
-            }
-            std::cerr << "No more pTime data found \n";
+        WHERE pTime.date >= ?;)";
+        int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        try{//block 1
+            if (rc != SQLITE_OK)
+                throw (rc);
         } catch (int ecode) {
-            //handle errors
-            std::string err(errMsg);
-            sqlite3_free(errMsg); //free the error message memory
-            handleError(ecode, err,"storeDataDate()");
+            handleError(ecode, "No Err Msg Provided for block 1", "storeDataDate()");
+            cvr.notify_one();
+            return;
         }
+        rc = sqlite3_bind_text(stmt, 1, date.c_str(), -1, SQLITE_STATIC);
+        try{ //block 2
+            if (rc != SQLITE_OK)
+                throw (rc);
 
-        cvr.notify_one(); //notify the condition variable
+        } catch (int ecode){
+            handleError(ecode, "No Err Msg Provided for block 2", "storeDataDate()");
+            cvr.notify_one();
+            return;
+        }
+        try { //block 3
+            while ((rc = sqlite3_step(stmt)) == SQLITE_ROW){ //loop that steps through and gets all the necessary data to graph the time spent
+                outPTime ptime;
+                ptime.timeUsed = sqlite3_column_int(stmt, 0);
+                ptime.pName = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
+                ptime.aName = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)));
+                ptime.tName = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3)));
+                ptime.date = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4)));
+                ptime.cName = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5)));
+                rData.push(ptime);
+            }
+            if (rc!= SQLITE_DONE)
+                throw (rc);
+            std::cerr << "No more pTime data found \n";
+            cvr.notify_one();
+            return;
+
+        } catch (int ecode){
+            handleError(ecode, "No Err Msg Provided for block 3", "storeDataDate()");
+            cvr.notify_one();
+            return;
+        }
     }
 
 

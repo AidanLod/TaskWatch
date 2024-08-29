@@ -48,7 +48,7 @@ void W::WWindow::monitoringLoop() {
         time = static_cast<int>(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         getWindowName("_NET_WM_NAME");
         if (activeWindow != previousWindow){
-            std::cerr << currentWindowName << std::endl;
+//            std::cerr << currentWindowName << std::endl;
             previousWindow = activeWindow;
             getClassName();
             previousWindowName = currentWindowName;
@@ -67,7 +67,7 @@ void W::WWindow::monitoringLoop() {
 
         }
         else if(database.activityChanged() || currentWindowName != previousWindowName){
-            std::cerr << currentWindowName << std::endl;
+//            std::cerr << currentWindowName << std::endl;
             previousWindowName = currentWindowName;
             d.programName = currentWindowName;
             d.time = time;
@@ -137,7 +137,7 @@ void W::WWindow::getClassName() {
     XClassHint classHint;
     if (XGetClassHint(display, activeWindow, &classHint)){
         currentClassName = classHint.res_class;
-        std::cerr << currentClassName << std::endl;
+//        std::cerr << currentClassName << std::endl;
     }
     else{
         std::cerr << "Failed to get WM_CLASS for window\n";
@@ -179,7 +179,7 @@ std::string W::WWindow::getPath(pid_t &pid) {
 }*/
 
 std::string W::WWindow::findFile(std::string &className) { //fix this to make it more stable
-    std::vector<std::string> searchPaths = {"/usr/share/applications/", "/var/lib/flatpak/exports/share/applications/"};
+    std::vector<std::string> searchPaths = {"/usr/share/applications/", "/var/lib/flatpak/exports/share/applications/", "/usr/local/share/applications/"};
 
     for (const std::string& dir : searchPaths) {
         std::string command = "grep -li \"Name=" + className + "\" " + dir + "*.desktop";
@@ -196,7 +196,7 @@ std::string W::WWindow::findFile(std::string &className) { //fix this to make it
         pclose(pipe);
     }
     //second try with search for Exec with case-insensitive exact match
-    std::cerr << "second search\n";
+//    std::cerr << "second search\n";
     for (const std::string& dir : searchPaths) {
         std::string command = "grep -lix \"Exec=" + className + "\" " + dir + "*.desktop";
         FILE* pipe = popen(command.c_str(), "r");
@@ -212,7 +212,7 @@ std::string W::WWindow::findFile(std::string &className) { //fix this to make it
         pclose(pipe);
     }
     //third try with search for Exec without exact match
-    std::cerr << "third search\n";
+//    std::cerr << "third search\n";
     for (const std::string& dir : searchPaths) {
         std::string command = "grep -li \"Exec=" + className + "\" " + dir + "*.desktop";
         FILE* pipe = popen(command.c_str(), "r");
@@ -228,26 +228,33 @@ std::string W::WWindow::findFile(std::string &className) { //fix this to make it
         pclose(pipe);
     }
     //fourth try where goes through and checks each part of the string
-    std::cerr << "fourth search\n";
+//    std::cerr << "fourth search\n";
     std::regex specialCharRegex("[^a-zA-Z0-9]+"); //excludes all alphanumeric characters
     std::sregex_token_iterator end;
     std::sregex_token_iterator iter(className.begin(), className.end(), specialCharRegex, -1);
     while (iter != end) {
-        std::cerr << iter->str() << std::endl;
-        for (const std::string &dir: searchPaths) {
-            std::string command = "grep -li \"" + iter->str() + "\" " + dir + "*.desktop";
-            FILE *pipe = popen(command.c_str(), "r");
-            if (!pipe) {
-                std::cerr << "Cannot run grep command\n";
-                continue;
-            }
-            char buffer[PATH_MAX];
-            if (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        std::string temp = iter->str();
+        for (int i = 0; i < 2; i++) {
+            for (const std::string &dir: searchPaths) {
+                std::string command = "grep -li \"" + temp + "\" " + dir + "*.desktop";
+                FILE *pipe = popen(command.c_str(), "r");
+                if (!pipe) {
+                    std::cerr << "Cannot run grep command\n";
+                    continue;
+                }
+                char buffer[PATH_MAX];
+                if (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+                    pclose(pipe);
+//                    std::cerr << "found\n";
+                    return std::string(buffer);
+                }
+
                 pclose(pipe);
-                std::cerr << "found\n";
-                return std::string(buffer);
             }
-            pclose(pipe);
+            for (char& c : temp)
+            {
+                c = std::tolower(static_cast<unsigned char>(c));
+            }
         }
         iter++;
     }
@@ -266,7 +273,7 @@ std::string W::WWindow::getWinCategory(std::string &filePath) {
     std::string line;
     while (std::getline(desFile, line)) {
         if (line.find("Categories=") == 0) {
-            std::cerr << line << std::endl;
+//            std::cerr << line << std::endl;
             return line.substr(10);
         }
     }
