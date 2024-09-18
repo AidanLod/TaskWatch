@@ -13,7 +13,206 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(0, 0, 0);
+</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 0, 0);</string>
+   </property>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>140</y>
+      <width>161</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Serif</family>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);
+border: 2px solid;
+border-color: rgb(192, 191, 188);</string>
+    </property>
+    <property name="title">
+     <string>Format Chart</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignHCenter</set>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDateEdit" name="selectStartDate">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 255, 255);
+font: 10pt &quot;Serif&quot;;
+border: 2px solid;
+border-color: rgb(222, 221, 218);</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="selectType">
+       <property name="font">
+        <font>
+         <family>Serif</family>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 255, 255);
+border: 2px solid;
+border-color: rgb(192, 191, 188);</string>
+       </property>
+       <property name="currentText">
+        <string/>
+       </property>
+       <property name="insertPolicy">
+        <enum>QComboBox::InsertPolicy::InsertAtBottom</enum>
+       </property>
+       <property name="placeholderText">
+        <string>Select Sort Type</string>
+       </property>
+       <item>
+        <property name="text">
+         <string extracomment="Sort the data by the activity that it took place in">Activity</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string extracomment="Sort the data by the category of app that the program falls under">Category</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string extracomment="Sort the data by the date that it took place">Date</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 255, 255);
+border: 2px Solid;
+border-color: rgb(119, 118, 123);
+font: 700 10pt &quot;Serif&quot;;</string>
+       </property>
+       <property name="text">
+        <string>Display Data</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>170</y>
+      <width>151</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Serif</family>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);
+border: 2px solid;
+border-color: rgb(192, 191, 188);</string>
+    </property>
+    <property name="title">
+     <string>Switch Activity</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="activity">
+       <property name="font">
+        <font>
+         <family>Serif</family>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 255, 255);
+border: 2px solid;
+border-color: rgb(192, 191, 188);</string>
+       </property>
+       <property name="placeholderText">
+        <string>Activity</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>Gaming</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Work</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Research</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Chatting</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="font">
+        <font>
+         <family>Serif</family>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 255, 255);
+border: 2px solid;
+border-color: rgb(192, 191, 188);</string>
+       </property>
+       <property name="text">
+        <string>Switch</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -27,5 +226,44 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showChart()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>281</x>
+     <y>310</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>454</x>
+     <y>388</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeActivity()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>601</x>
+     <y>289</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>723</x>
+     <y>294</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <signal>displayCalendar()</signal>
+  <slot>showCalendar()</slot>
+  <slot>showChart()</slot>
+  <slot>changeActivity()</slot>
+ </slots>
 </ui>
