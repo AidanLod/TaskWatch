@@ -284,6 +284,9 @@ std::string W::WWindow::getWinCategory(std::string &filePath) {
 }
 
 std::string W::WWindow::refineWinCategory(const std::string& inCat) {
+    if (inCat.find("Game") != std::string::npos){
+        return "Games";
+    }
     if (inCat.find("Settings") != std::string::npos){
         return "Settings";
     }
@@ -292,9 +295,6 @@ std::string W::WWindow::refineWinCategory(const std::string& inCat) {
     }
     if (inCat.find("Education") != std::string::npos){
         return "Education";
-    }
-    if (inCat.find("Game") != std::string::npos){
-        return "Games";
     }
     if (inCat.find("Graphics") != std::string::npos){
         return "Graphics";

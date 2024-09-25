@@ -27,6 +27,7 @@ private slots:
     void showChart();
     void removeChart(GraphWidget *chart);
     void changeActivity();
+    void disableButtons();
 
 private:
     Ui::MainWindow *ui;

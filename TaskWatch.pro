@@ -14,13 +14,17 @@ SOURCES += \
     WWindow.cpp \
     graphwidget.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    messagepopup.cpp \
+    pielist.cpp
 
 HEADERS += \
     QueryClass.h \
     WWindow.h \
     graphwidget.h \
-    mainwindow.h
+    mainwindow.h \
+    messagepopup.h \
+    pielist.h
 
 
 FORMS += \

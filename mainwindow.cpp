@@ -8,9 +8,12 @@ MainWindow::MainWindow(QWidget *parent)
     , chartCounter(0)
 {
     ui->setupUi(this);
+    setWindowTitle("TaskWatch");
     layout = new QVBoxLayout();
     ui->centralwidget->setLayout(layout);
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::showChart);
+    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::disableButtons);
+    connect(ui->pushButton_2, &QPushButton::clicked, this, &MainWindow::changeActivity);
 }
 
 MainWindow::~MainWindow()
@@ -41,6 +44,7 @@ void MainWindow::showChart(){
     temp.date = date.toStdString();
     database->handleTraffic(temp);
     std::queue<Q::outPTime> unsortedData;
+    graphableData.clear();
     unsortedData = database->getData();
     while(!unsortedData.empty()){
         Q::outPTime pTime = unsortedData.front();
@@ -91,6 +95,8 @@ void MainWindow::showChart(){
 void MainWindow::removeChart(GraphWidget *chart){
     layout->removeWidget(chart);
     chart->deleteLater();
+    ui->pushButton->setDisabled(false);
+    ui->pushButton_2->setDisabled(false);
     --chartCounter;
 }
 
@@ -101,4 +107,9 @@ void MainWindow::changeActivity() {
     temp.table = Q::ACTIVITY;
 
     database->handleTraffic(temp);
+}
+
+void MainWindow::disableButtons(){
+    ui->pushButton->setDisabled(true);
+    ui->pushButton_2->setDisabled(true);
 }

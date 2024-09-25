@@ -45,26 +45,40 @@ border-color: rgb(192, 191, 188);</string>
      <string>Format Chart</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignHCenter</set>
+     <set>Qt::AlignBottom|Qt::AlignHCenter</set>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="Line" name="line">
        <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QDateEdit" name="selectStartDate">
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 255, 255);
-font: 10pt &quot;Serif&quot;;
-border: 2px solid;
-border-color: rgb(222, 221, 218);</string>
+        <string notr="true">QComboBox { 
+                               background-color: white; 
+                               border: 2px solid rgb(192, 191, 188); 
+                               font-family: Serif; 
+                               color: black; 
+                            } 
+                            QComboBox QAbstractItemView { 
+                                background-color: white; 
+                                color: black; 
+                                font-family: Serif; 
+                            } </string>
        </property>
        <property name="calendarPopup">
         <bool>true</bool>
+       </property>
+       <property name="date">
+        <date>
+         <year>2024</year>
+         <month>9</month>
+         <day>17</day>
+        </date>
        </property>
       </widget>
      </item>
@@ -76,15 +90,23 @@ border-color: rgb(222, 221, 218);</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 255, 255);
-border: 2px solid;
-border-color: rgb(192, 191, 188);</string>
+        <string notr="true">QComboBox { 
+                               background-color: white; 
+                               border: 2px solid rgb(192, 191, 188); 
+                               font-family: Serif; 
+                               color: black; 
+                            } 
+                            QComboBox QAbstractItemView { 
+                                background-color: white; 
+                                color: black; 
+                                font-family: Serif; 
+                            } </string>
        </property>
        <property name="currentText">
         <string/>
        </property>
        <property name="insertPolicy">
-        <enum>QComboBox::InsertPolicy::InsertAtBottom</enum>
+        <enum>QComboBox::InsertAtBottom</enum>
        </property>
        <property name="placeholderText">
         <string>Select Sort Type</string>
@@ -145,13 +167,13 @@ border-color: rgb(192, 191, 188);</string>
      <string>Switch Activity</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignmentFlag::AlignCenter</set>
+     <set>Qt::AlignCenter</set>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="Line" name="line_2">
        <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
@@ -163,9 +185,17 @@ border-color: rgb(192, 191, 188);</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 255, 255);
-border: 2px solid;
-border-color: rgb(192, 191, 188);</string>
+        <string notr="true">QComboBox { 
+                               background-color: white; 
+                               border: 2px solid rgb(192, 191, 188); 
+                               font-family: Serif; 
+                               color: black; 
+                            } 
+                            QComboBox QAbstractItemView { 
+                                background-color: white; 
+                                color: black; 
+                                font-family: Serif; 
+                            } </string>
        </property>
        <property name="placeholderText">
         <string>Activity</string>
@@ -229,7 +259,7 @@ border-color: rgb(192, 191, 188);</string>
  <connections>
   <connection>
    <sender>pushButton</sender>
-   <signal>clicked()</signal>
+   <signal>pressed()</signal>
    <receiver>MainWindow</receiver>
    <slot>showChart()</slot>
    <hints>
@@ -259,11 +289,28 @@ border-color: rgb(192, 191, 188);</string>
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>pressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>disableButtons()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>250</x>
+     <y>305</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>419</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>displayCalendar()</signal>
   <slot>showCalendar()</slot>
   <slot>showChart()</slot>
   <slot>changeActivity()</slot>
+  <slot>disableButtons()</slot>
  </slots>
 </ui>

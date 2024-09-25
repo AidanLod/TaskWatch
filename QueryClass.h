@@ -62,6 +62,7 @@ namespace Q
             //getting started
         void buildTables(); //builds the database tables if they don't exist
         void requestLoop(); //always running only stops at due to mutex locks or the end of the program
+        void setInactive(); //sets all the activities to inactive
             //error handling
         void handleError(int ecode, std::string, const std::string&); //handles all sqlite return error codes
             //callBacks for sqlite3_exec()

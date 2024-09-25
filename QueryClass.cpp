@@ -24,6 +24,7 @@ namespace Q {
         }
         buildTables();
         running = true;
+        setInactive();
         qLoop = std::thread(&QueryClass::requestLoop, this);
         data d;
         d.typeName = "Misc";
@@ -104,6 +105,24 @@ namespace Q {
             }
             else {
                 editPtime(lastPTimeID, d.time);
+            }
+        }
+    }
+
+    void QueryClass::setInactive() {
+        char* errMsg = nullptr;
+        std::string sql = "UPDATE activity\n"
+                          "SET active = 0;";
+        try {
+            int rc = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
+            if (rc != SQLITE_OK) {
+                throw rc;
+            }
+        } catch (int ecode){
+            std::string err(errMsg);
+            handleError(ecode, err, "setInactive()");
+            if (errMsg) {
+                sqlite3_free(errMsg);
             }
         }
     }
