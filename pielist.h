@@ -15,7 +15,7 @@ class PieList : public QWidget
     Q_OBJECT
 public:
     explicit PieList(QWidget *parent = nullptr);
-    void addData(std::vector<Q::outPTime>&);
+    void addData(std::vector<QueryC::outPTime>&);
 signals:
     void closeList(PieList *list);
 private slots:
@@ -25,7 +25,7 @@ private:
     QListWidget* dataList;
     QComboBox* chooseSort;
     QPushButton* closeButton;
-    std::vector<Q::outPTime> data;
+    std::vector<QueryC::outPTime> data;
 };
 
 #endif // PIELIST_H

@@ -4,7 +4,7 @@
 //
 #include "WWindow.h"
 
-W::WWindow::WWindow(Q::QueryClass& db, unsigned char& ec): exitCode(ec), database(db) {
+W::WWindow::WWindow(QueryC::QueryClass& db, unsigned char& ec): exitCode(ec), database(db) {
     eFile = freopen("ErrorOutput.txt", "w", stderr);
     if (eFile == nullptr) {
         std::cerr << "Error redirecting stderr to file." << std::endl;
@@ -13,8 +13,11 @@ W::WWindow::WWindow(Q::QueryClass& db, unsigned char& ec): exitCode(ec), databas
     monitoring.store(false);
     display = XOpenDisplay(nullptr);
     if (!display) {
-        std::cerr << "Failed to open X display." << std::endl;
-        exitCode = 1;
+        MessagePopup temp;
+        std::string title = "ERROR";
+        std::string info = "Failed to open X display";
+        temp.setMessage(title, info);
+        temp.showMessage();
     }
     startMonitoring();
     getDate();
@@ -30,7 +33,7 @@ W::WWindow::~WWindow() {
 
 void W::WWindow::startMonitoring() {
     d.activityName = "Free Time";
-    d.table = Q::ACTIVITY;
+    d.table = QueryC::ACTIVITY;
     d.time = static_cast<int>(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now())); //this line gets the current unix timestamp which is of type time_point, it is then converted to time_t which is typically a long, and then it is static cast as an int
     database.handleTraffic(d);
     monitoring.store(true);
@@ -57,7 +60,7 @@ void W::WWindow::monitoringLoop() {
             getDate();
             std::string p = findFile(currentClassName); //finds a .desktop file with the same Icon name
             p.pop_back();
-            d.table = Q::PTIME;
+            d.table = QueryC::PTIME;
             d.time = time;
             d.date = date;
             d.programName = currentWindowName;
@@ -88,7 +91,11 @@ void W::WWindow::getWindowName(const std::string& winEl) {
     // Get the atom for _NET_ACTIVE_WINDOW
     Atom netActiveWindow = XInternAtom(display, "_NET_ACTIVE_WINDOW", True);
     if (netActiveWindow == None) {
-        std::cerr << "Failed to get _NET_ACTIVE_WINDOW atom." << std::endl;
+        MessagePopup temp;
+        std::string title = "ERROR";
+        std::string info = "Failed to get _NET_ACTIVE_WINDOW atom.";
+        temp.setMessage(title, info);
+        temp.showMessage();
         return;
     }
 
@@ -129,8 +136,11 @@ void W::WWindow::getWindowName(const std::string& winEl) {
         XFree(prop);
     }
     if (currentWindowName.empty()) {
-        std::cerr << "Failed to get the active window name." << std::endl;
-        exitCode = 1;
+        MessagePopup temp;
+        std::string title = "ERROR";
+        std::string info = "Failed to get the active window name.";
+        temp.setMessage(title, info);
+        temp.showMessage();
     }
 }
 

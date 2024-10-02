@@ -49,7 +49,7 @@ PieList::PieList(QWidget *parent)
 
 }
 
-void PieList::addData(std::vector<Q::outPTime>& d){
+void PieList::addData(std::vector<QueryC::outPTime>& d){
     data = d;
     if (d.empty()){
         std::cout << "empty\n";
@@ -63,7 +63,7 @@ void PieList::sortList(){
     QString cSection;
     QString item;
     if (chooseSort->currentIndex() == 0){
-        for (Q::outPTime &o: data){
+        for (QueryC::outPTime &o: data){
             if (cSection.toStdString() != o.aName){
                 dataList->addItem(QString::fromStdString(o.aName) + ":");
                 cSection = QString::fromStdString(o.aName);
@@ -74,7 +74,7 @@ void PieList::sortList(){
         }
     }
     else if (chooseSort->currentIndex() == 1){
-        for (Q::outPTime &o: data){
+        for (QueryC::outPTime &o: data){
             if (cSection.toStdString() != o.tName){
                 dataList->addItem(QString::fromStdString(o.tName) + ":");
                 cSection = QString::fromStdString(o.tName);
@@ -85,7 +85,7 @@ void PieList::sortList(){
         }
     }
     else if (chooseSort->currentIndex() == 2){
-        for (Q::outPTime &o: data){
+        for (QueryC::outPTime &o: data){
             if (cSection.toStdString() != o.date){
                 dataList->addItem(QString::fromStdString(o.date) + ":");
                 cSection = QString::fromStdString(o.date);

@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 {
     unsigned char ecode; //error code for error popup handling
     QApplication a(argc, argv);
-    Q::QueryClass qc(ecode);
+    QueryC::QueryClass qc(ecode);
     W::WWindow changeCheck(qc, ecode);
     MainWindow w;
     w.init(qc);

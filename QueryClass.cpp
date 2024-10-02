@@ -2,13 +2,16 @@
 // Created by main on 6/2/24.
 //
 #include "QueryClass.h"
-namespace Q {
+namespace QueryC {
     //getting started
     QueryClass::QueryClass(unsigned char &ec) : exitCode(ec) {
         file = freopen("ErrorOutput.txt", "w", stderr);
         if (file == nullptr) {
-            std::cerr << "Error redirecting stderr to file." << std::endl;
-            exitCode = 1;
+            MessagePopup temp;
+            std::string title = "ERROR";
+            std::string info = "Error redirecting stderr to file.";
+            temp.setMessage(title, info);
+            temp.showMessage();
         }
         //file = freopen("log.txt", "w", stdout);
         try {
@@ -18,9 +21,13 @@ namespace Q {
                 throw (rc);
             }
         } catch (int ecode) {
+            MessagePopup temp;
+            std::string title = "ERROR";
+            std::string info = "CRITICAL ERROR\nCLOSING PROGRAM";
+            temp.setMessage(title, info);
+            temp.showMessage();
             std::cerr << "CRITICAL ERROR\nCLOSING PROGRAM\n";
             handleError(ecode, "FAILED TO OPEN/CREATE DATABASE", "QueryClass()");
-            exit(1);
         }
         buildTables();
         running = true;
@@ -152,47 +159,56 @@ namespace Q {
         std::cerr << "Additional information for provided SQLite error codes may be found at\n"
                      "https://sqlite.org/rescode.html#ok\n";
         std::cerr << sqlite3_errmsg(db) << std::endl;
+        MessagePopup temp;
+        std::string title = "ERROR";
+        std::string info;
         switch (ecode) {
-            case 1:
-                std::cerr << "ERR Code (Q1): SQLITE_ERROR\n"
-                             "ERR Msg: " << errmsg << "\n"
-                             "Something went wrong. Code returned in " << fName
-                          << std::endl;
-                exitCode = 1;
+        case 1:
+                info = "ERR Code (Q1): SQLITE_ERROR\n"
+                               "ERR Msg: " + errmsg + "\n"
+                                            "Something went wrong. Code returned in " + fName;
+                temp.setMessage(title, info);
+                temp.showMessage();
                 break;
             case 2:
-                std::cerr << "ERR Code (Q2): SQLITE_INTERNAL\n"
-                             "ERR Msg: " << errmsg << "\n"
-                             "Bug in database engine. Code returned in " << fName
-                          << std::endl;
-                exitCode = 1;
+                info = "ERR Code (Q2): SQLITE_INTERNAL\n"
+                                   "ERR Msg: " + errmsg + "\n"
+                                                "Bug in database engine. Code returned in " + fName;
+                temp.setMessage(title, info);
+                temp.showMessage();
                 break;
             case 3:
-                std::cerr << "ERR Code (Q3): SQLITE_PERM\n"
-                             "ERR Msg: " << errmsg << "\n"
-                             "The access mode for a newly created database could not be provided. Code returned"
-                             " in " << fName << std::endl;
-                exitCode = 1;
+                info = "ERR Code (Q3): SQLITE_PERM\n"
+                                   "ERR Msg: " + errmsg + "\n"
+                                                "The access mode for a newly created database could not be provided. Code returned"
+                                                " in " + fName;
+                temp.setMessage(title, info);
+                temp.showMessage();
                 break;
             case 4:
-                std::cerr << "ERR Code (Q4): SQLITE_ABORT\n"
-                             "ERR Msg: " << errmsg << "\n"
-                             "An operation was aborted prior to completion. Code returned in exception block "
-                             " in " << fName << std::endl;
-                exitCode = 1;
+                info = "ERR Code (Q4): SQLITE_ABORT\n"
+                       "ERR Msg: " + errmsg + "\n"
+                                    "An operation was aborted prior to completion. Code returned in exception block "
+                                    " in " + fName;
+                temp.setMessage(title, info);
+                temp.showMessage();
                 break;
             case 5:
-                std::cerr << "ERR Code (Q5): SQLITE_BUSY\n"
-                             "ERR Msg: " << errmsg << "\n"
-                             "The database file could not be written or read from because of concurrent activity. Code returned"
-                             " in " << fName << std::endl;
+                info = "ERR Code (Q5): SQLITE_BUSY\n"
+                       "ERR Msg: " + errmsg + "\n"
+                                    "The database file could not be written or read from because of concurrent activity. Code returned"
+                                    " in " + fName;
+                temp.setMessage(title, info);
+                temp.showMessage();
                 break;
             case 6:
-                std::cerr << "ERR Code (Q6): SQLITE_LOCKED\n"
-                             "ERR Msg: " << errmsg << "\n"
-                             "A write operation could not continue because of a conflict within the same database connection or a conflict "
-                             "with a different database connection that uses a shared cache. Code returned"
-                             " in " << fName << std::endl;
+                info = "ERR Code (Q6): SQLITE_LOCKED\n"
+                       "ERR Msg: " + errmsg + "\n"
+                                    "A write operation could not continue because of a conflict within the same database connection or a conflict "
+                                    "with a different database connection that uses a shared cache. Code returned"
+                                    " in " + fName;
+                temp.setMessage(title, info);
+                temp.showMessage();
                 break;
             case 19:
                 std::cerr << "ERR Code (Q19): SQLITE_CONSTRAINT\n"
@@ -207,9 +223,10 @@ namespace Q {
                              "Code returned in " << fName << std::endl;
                 break;
             default:
-                std::cerr <<"ERR Msg: " << errmsg << "\n"
-                            "unfortunately haven't catalogued this error from " << fName << std::endl;
-                exitCode = 1;
+                info = "ERR Msg: " + errmsg + "\n"
+                                                "unfortunately haven't catalogued this error from " + fName;
+                temp.setMessage(title, info);
+                temp.showMessage();
                 break;
 
         }
@@ -284,21 +301,30 @@ namespace Q {
         //goes here once there is no currently active activity
         //enters if activity insertion failed in an unexpected way
         if (!insertActivity(name)) {
-            std::cerr << "Failed to insert and/or start activity\n";
-            exitCode = 1;
+            MessagePopup temp;
+            std::string title = "ERROR";
+            std::string info = "Failed to insert and/or start activity";
+            temp.setMessage(title, info);
+            temp.showMessage();
             return;
         }
         //goes here to get the newly activated activites id
         int tempID = currentActivity;
         if (!getActivityID(name)) {
-            std::cerr << "Failed to get activity ID\n";
+            MessagePopup temp;
+            std::string title = "ERROR";
+            std::string info = "Failed to get activity ID";
+            temp.setMessage(title, info);
+            temp.showMessage();
             currentActivity = tempID;
-            exitCode = 1;
             return;
         }
         if (!changeActive(1, currentActivity)){
-            std::cerr << "Failed to change active\n";
-            exitCode = 1;
+            MessagePopup temp;
+            std::string title = "ERROR";
+            std::string info = "Failed to change active";
+            temp.setMessage(title, info);
+            temp.showMessage();
         }
    }
 
@@ -356,7 +382,6 @@ namespace Q {
             //handle errors
             std::string err(errMsg);
             handleError(ecode, err, "changeActive()");
-            exitCode = 1;
             if (errMsg) {
                 sqlite3_free(errMsg); //free the error message memory
             }
@@ -380,7 +405,6 @@ namespace Q {
             std::string err(errMsg);
             sqlite3_free(errMsg); //free the error message memory
             handleError(ecode, err,"editPTime()");
-            exitCode = 1;
             return;
         }
 

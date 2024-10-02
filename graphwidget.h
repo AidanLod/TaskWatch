@@ -14,7 +14,7 @@
 #include <QLabel>
 #include <QGraphicsDropShadowEffect>
 
-enum sortType {ACTIVITY, TYPE, DATE};
+
 
 class GraphWidget : public QWidget
 {
@@ -22,7 +22,9 @@ class GraphWidget : public QWidget
 public:
     explicit GraphWidget(QWidget *parent = nullptr, QString name = "Pie");
 
-    void addSlice(std::vector<std::vector<Q::outPTime>>&, sortType);
+    void addSlice(std::vector<std::vector<QueryC::outPTime>>&, int);
+    void addSliceReset();
+    void resortData();
 
 public slots:
     void updateSliceLabels();
@@ -32,15 +34,16 @@ public slots:
 
 private:
     QComboBox *displayMode;
+    QComboBox *howSort;
     QChart *chart;
     QPieSeries *series;
     QChartView *chartView;
     QLabel *hoverLabel;
-    std::vector<std::vector<Q::outPTime>> *data;
+    std::vector<std::vector<QueryC::outPTime>> *data;
     QPushButton *closeButton;
     qreal totalValue = 0;
     std::vector<QPieSlice*> slices;
-    sortType sT;
+    int sT;
     QVBoxLayout *layout;
 
 signals:

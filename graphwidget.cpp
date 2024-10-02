@@ -32,6 +32,21 @@ GraphWidget::GraphWidget(QWidget *parent, QString name)
                             "    font-family: Serif; "
                             "} ");
 
+    howSort = new QComboBox(this);
+    howSort->addItem("Sort by Activity");
+    howSort->addItem("Sort by Category");
+    howSort->addItem("Sort by Date");
+    howSort->setStyleSheet("QComboBox { "
+                               "   background-color: white; "
+                               "   border: 2px solid rgb(192, 191, 188); "
+                               "   font-family: Serif; "
+                               "   color: black; "  // Set text color
+                               "} "
+                               "QComboBox QAbstractItemView { "
+                               "    background-color: white; "
+                               "    color: black; "
+                               "    font-family: Serif; "
+                               "} ");
     hoverLabel = new QLabel(this);
     hoverLabel->setText("Click to display data list.");
     hoverLabel->setAlignment(Qt::AlignCenter);
@@ -45,42 +60,96 @@ GraphWidget::GraphWidget(QWidget *parent, QString name)
 
     setMouseTracking(true);
     layout = new QVBoxLayout(this);
+    layout->addWidget(howSort);
+    layout->addWidget(displayMode);
     layout->addWidget(chartView);
     layout->addWidget(closeButton);
-    layout->addWidget(displayMode);
     setLayout(layout);
 
     connect(closeButton, &QPushButton::clicked, [this](){
         emit closeChart(this);
     });
-    connect(displayMode, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &GraphWidget::updateSliceLabels);
+    connect(displayMode, &QComboBox::currentIndexChanged, this, &GraphWidget::updateSliceLabels);
+    connect(howSort, &QComboBox::currentIndexChanged, this, &GraphWidget::addSliceReset);
 
     /*connect(this, &QWidget::resizeEvent, [this](QResizeEvent *) {
         closeButton->move(this->width() - closeButton->width() - 10, 10);
     });*/
 }
 
-void GraphWidget::addSlice(std::vector<std::vector<Q::outPTime>>& values, sortType t){
+void GraphWidget::addSlice(std::vector<std::vector<QueryC::outPTime>>& values, int t){
     data = &values;
     sT = t;
     QPieSlice *slice;
     QVector<QColor> colors = {Qt::red, Qt::blue, Qt::green, Qt::yellow, Qt::cyan, Qt::magenta};
     int i = 0;
-    for (std::vector<Q::outPTime>& a: values){
+    for (std::vector<QueryC::outPTime>& a: values){
         bool set = false;
         QString label;
         qreal value = 0;
-        for (Q::outPTime& b: a){
+        for (QueryC::outPTime& b: a){
 
             if (!set){
-                if (t == ACTIVITY){
+                if (t == 0){
                     label = QString::fromStdString(b.aName);
+                    howSort->setCurrentIndex(0);
                 }
-                else if (t == TYPE){
+                else if (t == 1){
                     label = QString::fromStdString(b.tName);
+                    howSort->setCurrentIndex(1);
                 }
-                else if (t == DATE){
+                else if (t == 2){
                     label = QString::fromStdString(b.date);
+                    howSort->setCurrentIndex(2);
+                }
+                set = true;
+            }
+            value += static_cast<qreal>(b.timeUsed);
+        }
+        totalValue += value;
+        slice = new QPieSlice(label, value);
+        slice->setBrush(colors[i % colors.size()]);
+        slice->setProperty("baseLabel", label);
+        connect(slice, &QPieSlice::doubleClicked, this, [this, slice]() {showList(slice);});
+        connect(slice, &QPieSlice::hovered, this, &GraphWidget::displayLabel);
+        i++;
+        slices.push_back(slice);
+        series->append(slice);
+    }
+
+    updateSliceLabels();
+
+}
+
+void GraphWidget::addSliceReset(){
+    series->clear();
+    slices.clear();
+    sT = howSort->currentIndex();
+    resortData();
+    QPieSlice *slice;
+    QVector<QColor> colors = {Qt::red, Qt::blue, Qt::green, Qt::yellow, Qt::cyan, Qt::magenta};
+    int i = 0;
+    for (std::vector<QueryC::outPTime>& a: *data){
+        bool set = false;
+        QString label;
+        qreal value = 0;
+        for (QueryC::outPTime& b: a){
+
+            if (!set){
+                if (sT == 0){
+                    label = QString::fromStdString(b.aName);
+                    howSort->setCurrentIndex(0);
+                    chart->setTitle("Activity Chart");
+                }
+                else if (sT == 1){
+                    label = QString::fromStdString(b.tName);
+                    howSort->setCurrentIndex(1);
+                    chart->setTitle("Category Chart");
+                }
+                else if (sT == 2){
+                    label = QString::fromStdString(b.date);
+                    howSort->setCurrentIndex(2);
+                    chart->setTitle("Date Chart");
                 }
                 set = true;
             }
@@ -118,21 +187,21 @@ void GraphWidget::showList(QPieSlice* p) {
     PieList *list = new PieList(this);
 
     for (size_t i = 0; i < data->size(); i++){
-        if (sT == ACTIVITY){
+        if (sT == 0){
             if (p->property("baseLabel").toString().toStdString() == data->at(i).at(0).aName){
                 list->addData(data->at(i));
                 break;
             }
 
         }
-        else if (sT == TYPE){
+        else if (sT == 1){
             if (p->property("baseLabel").toString().toStdString() == data->at(i).at(0).tName){
                 list->addData(data->at(i));
                 break;
             }
 
         }
-        else if (sT == DATE){
+        else if (sT == 2){
             if (p->property("baseLabel").toString().toStdString() == data->at(i).at(0).date){
                 list->addData(data->at(i));
                 break;
@@ -162,4 +231,51 @@ void GraphWidget::removeList(PieList *list){
     layout->removeWidget(list);
     list->deleteLater();
 
+}
+
+void GraphWidget::resortData(){
+    std::vector<QueryC::outPTime> temp;
+    for (std::vector<QueryC::outPTime>& v: *data){
+        for (QueryC::outPTime o: v){
+            temp.push_back(o);
+        }
+    }
+    data->clear();
+    std::vector<std::vector<QueryC::outPTime>> sortedData;
+    bool found = false;
+    while(!temp.empty()){
+        QueryC::outPTime pTime = temp.back();
+        temp.pop_back();
+        bool found = false;
+        for (std::vector<QueryC::outPTime>& a: *data){
+            if(sT == 1){
+                if (a[0].tName == pTime.tName){
+                    a.push_back(pTime);
+                    found = true;
+                    break;
+                }
+            }
+            else if(sT == 2){
+                if (a[0].date == pTime.date){
+                    a.push_back(pTime);
+                    found = true;
+                    break;
+                }
+            }
+            else {
+
+                if (a[0].aName == pTime.aName){
+                    a.push_back(pTime);
+                    found = true;
+                    break;
+                }
+            }
+
+        }
+        if (!found){
+            std::vector<QueryC::outPTime> newCat;
+            newCat.push_back(pTime);
+            data->push_back(newCat);
+        }
+    }
 }

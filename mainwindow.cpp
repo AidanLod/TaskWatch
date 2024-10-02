@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("TaskWatch");
     layout = new QVBoxLayout();
     ui->centralwidget->setLayout(layout);
-    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::showChart);
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::disableButtons);
     connect(ui->pushButton_2, &QPushButton::clicked, this, &MainWindow::changeActivity);
 }
@@ -21,38 +20,29 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::init(Q::QueryClass& qc){
+void MainWindow::init(QueryC::QueryClass& qc){
     database = &qc;
 }
 
 void MainWindow::showChart(){
     QString sort = ui->selectType->currentText();
-    sortType type;
-    if (sort == "Activity"){
-        type = ACTIVITY;
-    }
-    else if (sort == "Category"){
-        type = TYPE;
-    }
-    else if (sort == "Date"){
-        type = DATE;
-    }
+    int type = ui->selectType->currentIndex();
     QString chartName = sort + " Chart";
-    Q::data temp;
+    QueryC::data temp;
     temp.request = true;
     const QString date = ui->selectStartDate->date().toString("yyyy-MM-dd");
     temp.date = date.toStdString();
     database->handleTraffic(temp);
-    std::queue<Q::outPTime> unsortedData;
+    std::queue<QueryC::outPTime> unsortedData;
     graphableData.clear();
     unsortedData = database->getData();
     while(!unsortedData.empty()){
-        Q::outPTime pTime = unsortedData.front();
+        QueryC::outPTime pTime = unsortedData.front();
         unsortedData.pop();
         bool found = false;
-        for (std::vector<Q::outPTime>& a: graphableData){
+        for (std::vector<QueryC::outPTime>& a: graphableData){
             if(sort == "Category"){
-                type = TYPE;
+                type = 1;
                 if (a[0].tName == pTime.tName){
                     a.push_back(pTime);
                     found = true;
@@ -60,7 +50,7 @@ void MainWindow::showChart(){
                 }
             }
             else if(sort == "Date"){
-                type = DATE;
+                type = 2;
                 if (a[0].date == pTime.date){
                     a.push_back(pTime);
                     found = true;
@@ -78,7 +68,7 @@ void MainWindow::showChart(){
 
         }
         if (!found){
-            std::vector<Q::outPTime> newCat;
+            std::vector<QueryC::outPTime> newCat;
             newCat.push_back(pTime);
             graphableData.push_back(newCat);
         }
@@ -102,9 +92,9 @@ void MainWindow::removeChart(GraphWidget *chart){
 
 void MainWindow::changeActivity() {
     QString activity = ui->activity->currentText();
-    Q::data temp;
+    QueryC::data temp;
     temp.activityName = activity.toStdString();
-    temp.table = Q::ACTIVITY;
+    temp.table = QueryC::ACTIVITY;
 
     database->handleTraffic(temp);
 }
@@ -112,4 +102,12 @@ void MainWindow::changeActivity() {
 void MainWindow::disableButtons(){
     ui->pushButton->setDisabled(true);
     ui->pushButton_2->setDisabled(true);
+}
+
+void MainWindow::displayMessage(){
+    MessagePopup temp;
+    std::string title = "Activity Changed";
+    std::string info = "Activity changed to " + ui->activity->currentText().toStdString();
+    temp.setMessage(title, info);
+    temp.showMessage();
 }

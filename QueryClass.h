@@ -14,8 +14,9 @@
 #include <tuple>
 #include <condition_variable>
 #include <utility>
+#include "messagepopup.h"
 
-namespace Q
+namespace QueryC
 {
     enum Table {ACTIVITY, PTIME, PROGRAM, TYPE, END};
     struct data{
@@ -90,11 +91,11 @@ namespace Q
         int getTimeUsed(int); //gets the timeUsed from the ptime with the corresponding id
         void getutss(int id); //gets the utss
         void storeDataDate(std::string date); //stores the data in rData
-            //thread safe queuing and dequeing
+            //thread safe queuing
         void addQueue(data&); //thread safe adding to queue
         data popQueue(); //thread safe popping from queue
         //objects
-        int currentActivity = 0;
+        int currentActivity = 0;//holds current activity id
         std::queue<data> requestQueue;
         unsigned char& exitCode;
         FILE* file;

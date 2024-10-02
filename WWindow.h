@@ -1,5 +1,7 @@
 #ifndef UNTITLED_WWINDOW_H
 #define UNTITLED_WWINDOW_H
+#include "messagepopup.h"
+#include "QueryClass.h"
 #include <iostream>
 #include <fstream>
 #include <X11/Xlib.h>
@@ -16,7 +18,6 @@
 #include <chrono>
 #include <ctime>
 #include <cstring>
-#include "QueryClass.h"
 #include <sstream>
 #include <iomanip>
 #include <climits>
@@ -30,7 +31,7 @@ namespace W
     class WWindow
     {
     public:
-        WWindow(Q::QueryClass& db, unsigned char& ec); //construct
+        WWindow(QueryC::QueryClass& db, unsigned char& ec); //construct
         ~WWindow(); //destruct
 
         void startMonitoring(); //starts a loop that calls getWindowName() every num seconds
@@ -54,8 +55,8 @@ namespace W
         std::string currentWindowName; //holds the most up-to-date window name, updates before windowCheck
         std::string previousWindowName; //holds the name of the previous window
         std::string currentClassName; //holds the most up-to-date class name
-        Q::QueryClass& database; //holds reference to QueryClass so that mutex locks can be handled properly
-        Q::data d;
+        QueryC::QueryClass& database; //holds reference to QueryClass so that mutex locks can be handled properly
+        QueryC::data d;
         Window activeWindow; //current active window
         Window previousWindow; //previous window recorded before verifying there has been a window change
         //threading

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include "QueryClass.h"
 #include "graphwidget.h"
+#include "messagepopup.h"
 #include <queue>
 #include <QVBoxLayout>
 #include <vector>
@@ -21,18 +22,19 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void init(Q::QueryClass& qc); //initialize database
+    void init(QueryC::QueryClass& qc); //initialize database
     void sortData(); //sorts the data so that it can be graphed
 private slots:
     void showChart();
     void removeChart(GraphWidget *chart);
     void changeActivity();
     void disableButtons();
+    void displayMessage();
 
 private:
     Ui::MainWindow *ui;
-    Q::QueryClass* database;
-    std::vector<std::vector<Q::outPTime>> graphableData; //holds the sorted graphable data
+    QueryC::QueryClass* database;
+    std::vector<std::vector<QueryC::outPTime>> graphableData; //holds the sorted graphable data
     QWidget *centralWidget;
     QVBoxLayout *layout;
     int chartCounter;
