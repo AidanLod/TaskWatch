@@ -13,6 +13,7 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QGraphicsDropShadowEffect>
+#include <cmath>
 
 
 

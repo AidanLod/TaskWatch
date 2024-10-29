@@ -202,6 +202,7 @@ std::string W::WWindow::findFile(std::string &className) { //fix this to make it
         char buffer[PATH_MAX];
         if (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
             pclose(pipe);
+            std::cout << buffer << std::endl;
             return std::string(buffer);
         }
         pclose(pipe);
@@ -317,6 +318,9 @@ std::string W::WWindow::refineWinCategory(const std::string& inCat) {
     }
     if (inCat.find("System") != std::string::npos || inCat.find("Emulator") != std::string::npos){
         return "System";
+    }
+    if (inCat.find("Office") != std::string::npos){
+        return "Office";
     }
     if (inCat.find("Accessibility") != std::string::npos || inCat.find("Core") != std::string::npos ||
             inCat.find("Legacy") != std::string::npos || inCat.find("Utility") != std::string::npos){

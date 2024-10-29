@@ -70,7 +70,6 @@ GraphWidget::GraphWidget(QWidget *parent, QString name)
         emit closeChart(this);
     });
     connect(displayMode, &QComboBox::currentIndexChanged, this, &GraphWidget::updateSliceLabels);
-    connect(howSort, &QComboBox::currentIndexChanged, this, &GraphWidget::addSliceReset);
 
     /*connect(this, &QWidget::resizeEvent, [this](QResizeEvent *) {
         closeButton->move(this->width() - closeButton->width() - 10, 10);
@@ -81,9 +80,13 @@ void GraphWidget::addSlice(std::vector<std::vector<QueryC::outPTime>>& values, i
     data = &values;
     sT = t;
     QPieSlice *slice;
-    QVector<QColor> colors = {Qt::red, Qt::blue, Qt::green, Qt::yellow, Qt::cyan, Qt::magenta};
+    srand(time(0));
     int i = 0;
     for (std::vector<QueryC::outPTime>& a: values){
+        int r = rand() % 256;
+        int g = rand() % 256;
+        int b = rand() % 256;
+        QColor colors(r, g, b);
         bool set = false;
         QString label;
         qreal value = 0;
@@ -108,7 +111,7 @@ void GraphWidget::addSlice(std::vector<std::vector<QueryC::outPTime>>& values, i
         }
         totalValue += value;
         slice = new QPieSlice(label, value);
-        slice->setBrush(colors[i % colors.size()]);
+        slice->setBrush(colors);
         slice->setProperty("baseLabel", label);
         connect(slice, &QPieSlice::doubleClicked, this, [this, slice]() {showList(slice);});
         connect(slice, &QPieSlice::hovered, this, &GraphWidget::displayLabel);
@@ -117,6 +120,7 @@ void GraphWidget::addSlice(std::vector<std::vector<QueryC::outPTime>>& values, i
         series->append(slice);
     }
 
+    connect(howSort, &QComboBox::currentIndexChanged, this, &GraphWidget::addSliceReset);
     updateSliceLabels();
 
 }
@@ -127,9 +131,12 @@ void GraphWidget::addSliceReset(){
     sT = howSort->currentIndex();
     resortData();
     QPieSlice *slice;
-    QVector<QColor> colors = {Qt::red, Qt::blue, Qt::green, Qt::yellow, Qt::cyan, Qt::magenta};
     int i = 0;
     for (std::vector<QueryC::outPTime>& a: *data){
+        int r = rand() % 256;
+        int g = rand() % 256;
+        int b = rand() % 256;
+        QColor colors(r, g, b);
         bool set = false;
         QString label;
         qreal value = 0;
@@ -157,7 +164,7 @@ void GraphWidget::addSliceReset(){
         }
         totalValue += value;
         slice = new QPieSlice(label, value);
-        slice->setBrush(colors[i % colors.size()]);
+        slice->setBrush(colors);
         slice->setProperty("baseLabel", label);
         connect(slice, &QPieSlice::doubleClicked, this, [this, slice]() {showList(slice);});
         connect(slice, &QPieSlice::hovered, this, &GraphWidget::displayLabel);
